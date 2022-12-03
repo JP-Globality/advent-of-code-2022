@@ -51,12 +51,12 @@ fn calculate_score(player_1_move: String, player_2_move: String) -> i32{
     let player_1_move_int = get_move_as_int(&player_1_move);
     let player_2_move_int = get_move_as_int(&player_2_move);
 
-    let s: HashMap<i32, i32> = HashMap::<_, _>::from_iter(IntoIter::new([
+    let rules: HashMap<i32, i32> = HashMap::<_, _>::from_iter(IntoIter::new([
         (1, 3),
         (2, 1),
         (3, 2)
     ]));
-    let losing_player_2_move = s.get(&player_1_move_int).unwrap();
+    let losing_player_2_move = rules.get(&player_1_move_int).unwrap();
     if &player_2_move_int == losing_player_2_move {
         // Player 1 wins
         return 6 + player_1_move_int;
