@@ -34,8 +34,7 @@ fn get_move_as_int(move_str: &str) -> i32 {
         ("A".to_string(), 1), ("B".to_string(), 2), ("C".to_string(), 3),
         ("X".to_string(), 1), ("Y".to_string(), 2), ("Z".to_string(), 3),
     ]));
-    let val= moves.get(move_str);
-    return val.copied().unwrap();
+    return moves.get(move_str).copied().unwrap();
 }
 
 fn calculate_score(player_1_move: String, player_2_move: String) -> i32{
