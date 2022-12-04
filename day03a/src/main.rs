@@ -6,7 +6,6 @@ use std::{
 
 use std::collections::{HashMap, HashSet};
 
-
 fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
     let file = File::open(filename).expect("no such file");
     let buf = BufReader::new(file);
@@ -56,15 +55,18 @@ fn create_scorecard() -> HashMap<String, i32> {
         // index starts at 0 but we need to start it from 1
         // Capital letters start with score 26 ( i.e 1 + 26 = 27)
         scorecard.insert((letter as char).to_string(), (index as i32) + 1);
-        scorecard.insert((letter as char).to_string().to_uppercase(), (index as i32) + 27);
+        scorecard.insert(
+            (letter as char).to_string().to_uppercase(),
+            (index as i32) + 27,
+        );
     }
 
-    return scorecard
+    return scorecard;
 }
 
 fn calculate_score_for_letter(letter: &String, scorecard: &HashMap<String, i32>) -> i32 {
     let val = scorecard.get(letter).unwrap();
-    return *val
+    return *val;
 }
 
 fn main() {
