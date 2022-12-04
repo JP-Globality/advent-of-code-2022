@@ -14,3 +14,8 @@ To run you can use:
 ```shell
 cargo run
 ```
+
+To format code run:
+```
+cargo fmt
+```
