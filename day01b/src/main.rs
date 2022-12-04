@@ -1,10 +1,9 @@
+use std::collections::HashSet;
 use std::{
     fs::File,
     io::{prelude::*, BufReader},
     path::Path,
 };
-use std::collections::HashSet;
-
 
 fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
     let file = File::open(filename).expect("no such file");
@@ -37,4 +36,3 @@ fn main() {
     let top_3_max: i32 = totals.iter().rev().take(3).sum();
     println!("{}", top_3_max)
 }
-
