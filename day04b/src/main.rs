@@ -49,7 +49,7 @@ fn create_cleaning_sections(line: &String) -> (HashSet<i32>, HashSet<i32>) {
 }
 
 fn are_sections_intersected(s1: HashSet<i32>, s2: HashSet<i32>) -> bool {
-    return s2.is_subset(&s1) || s1.is_subset(&s2);
+    return s1.intersection(&s2).count() > 0;
 }
 
 fn main() {
