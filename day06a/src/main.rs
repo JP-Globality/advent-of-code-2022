@@ -38,7 +38,6 @@ fn find_unique(str: &String) -> usize{
 
 
 fn main() {
-    // This gets the initial blocks
     let score: usize = lines_from_file("./input.txt")
         .iter()
         .map(|a| find_unique(a))

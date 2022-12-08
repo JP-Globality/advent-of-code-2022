@@ -18,7 +18,7 @@ fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
 fn find_unique(str: &String) -> usize{
     // example string  = mjqjpqmgbljsphdzt
     // We need to find the first time where we have 4 unique characters in a row
-    // then we return the character index + 4
+    // then we return the character index + 14
 
     for (i, c) in str.chars().enumerate() {
         let mut chars_set: HashSet<String> = HashSet::new();
@@ -38,7 +38,6 @@ fn find_unique(str: &String) -> usize{
 
 
 fn main() {
-    // This gets the initial blocks
     let score: usize = lines_from_file("./input.txt")
         .iter()
         .map(|a| find_unique(a))
