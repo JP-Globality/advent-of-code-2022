@@ -1,11 +1,10 @@
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashSet};
+use std::str::Chars;
 use std::{
     fs::File,
     io::{prelude::*, BufReader},
     path::Path,
 };
-use std::str::Chars;
-
 
 fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
     let file = File::open(filename).expect("no such file");
@@ -15,7 +14,7 @@ fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
         .collect()
 }
 
-fn find_unique(str: &String) -> usize{
+fn find_unique(str: &String) -> usize {
     // example string  = mjqjpqmgbljsphdzt
     // We need to find the first time where we have 4 unique characters in a row
     // then we return the character index + 14
@@ -29,13 +28,12 @@ fn find_unique(str: &String) -> usize{
         }
 
         if chars_set.len() == 14 {
-            return i + 14
+            return i + 14;
         }
     }
 
     panic!("Shouldn't be here - no 4 unique chars found!")
 }
-
 
 fn main() {
     let score: usize = lines_from_file("./input.txt")
