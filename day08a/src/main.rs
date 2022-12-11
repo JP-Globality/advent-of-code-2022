@@ -47,12 +47,6 @@ fn check_if_visible(
     tree_height: &i32,
     neighbour_direction: Option<(&i32, &i32)>,
 ) -> bool {
-    println!("----$$$$check if visible$$$$----");
-    println!("row_index: {}", row_index);
-    println!("col_index: {}", col_index);
-    println!("tree_height: {}", tree_height);
-    println!("neighbour_direction: {:?}", neighbour_direction);
-
     // First we check fo see if it's an edge value
     if check_if_edge(row_index, col_index, grid) {
         // if it is then we can assert that the tree is visible from the outside
@@ -61,7 +55,6 @@ fn check_if_visible(
 
     let neighbors = [(0, -1), (0, 1), (-1, 0), (1, 0)];
     for (xx, yy) in neighbors.iter() {
-        println!("----starting loop----");
         // neighbour_direction is a specified direction
         // we can skip all directions if one is pre specified
         if neighbour_direction.is_some() && neighbour_direction.unwrap() != (xx, yy) {
@@ -70,13 +63,9 @@ fn check_if_visible(
 
         // We want to keep iterating in the up,down,left,right direction until we reach
         // the end of the line
-
         let new_row_index = row_index + xx;
         let new_col_index = col_index + yy;
         let new_tree_height = grid[new_row_index as usize][new_col_index as usize];
-        println!("new_row_index: {}", new_row_index);
-        println!("new_col_index: {}", new_col_index);
-        println!("new_tree_height: {}", new_tree_height);
 
         // If it's an edge and the new tree height is less then we can assert that the tree
         // is visible from the outside
@@ -113,27 +102,7 @@ fn main() {
     // Create a grid [[row1],[row2]] where coordinates are (row, column)
     let grid: Vec<Vec<i32>> = create_grid();
 
-    // let vectors: Vec<bool> = grid
-    //     .iter()
-    //     .enumerate()
-    //     .map(|(row_index, row)| {
-    //         return row
-    //             .iter()
-    //             .enumerate()
-    //             .map(|(col_index, tree_height)| {
-    //                 check_if_visible(row_index as i32, col_index as i32, &grid, tree_height, None)
-    //             })
-    //             .collect::<Vec<bool>>();
-    //     })
-    //     .collect::<Vec<Vec<bool>>>()
-    //     .into_iter()
-    //     .flatten()
-    //     .collect::<Vec<bool>>();
-    //
-    // // let val: Vec<bool> = vectors.into_iter().flatten().collect();
-    // println!("{:?}", vectors);
-
-    let vectors: usize = grid
+    let score: usize = grid
         .iter()
         .enumerate()
         .map(|(row_index, row)| {
@@ -141,26 +110,13 @@ fn main() {
                 .iter()
                 .enumerate()
                 .map(|(col_index, tree_height)| {
-                    println!("----&&&&Beginning&&&&-------------------");
-                    let visible = check_if_visible(
+                    check_if_visible(
                         row_index as i32,
                         col_index as i32,
                         &grid,
                         tree_height,
                         None,
-                    );
-                    if visible {
-                        println!(
-                            "Tree is visible. Height: {}, coords are: ({}, {})",
-                            tree_height, row_index, col_index
-                        );
-                    } else {
-                        println!(
-                            "Tree not visible. Height: {}, coords are: ({}, {})",
-                            tree_height, row_index, col_index
-                        );
-                    }
-                    return visible;
+                    )
                 })
                 .collect::<Vec<bool>>();
         })
@@ -170,7 +126,5 @@ fn main() {
         .filter(|a| a.to_owned())
         .count();
 
-    // let val: Vec<bool> = vectors.into_iter().flatten().collect();
-    // println!("{:?}", vectors);
-    println!("{}", vectors);
+    println!("Score: {}", score);
 }
