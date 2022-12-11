@@ -142,11 +142,23 @@ fn main() {
                 .enumerate()
                 .map(|(col_index, tree_height)| {
                     println!("----&&&&Beginning&&&&-------------------");
-                    let visible = check_if_visible(row_index as i32, col_index as i32, &grid, tree_height, None);
+                    let visible = check_if_visible(
+                        row_index as i32,
+                        col_index as i32,
+                        &grid,
+                        tree_height,
+                        None,
+                    );
                     if visible {
-                        println!("Tree is visible. Height: {}, coords are: ({}, {})", tree_height, row_index, col_index);
+                        println!(
+                            "Tree is visible. Height: {}, coords are: ({}, {})",
+                            tree_height, row_index, col_index
+                        );
                     } else {
-                        println!("Tree not visible. Height: {}, coords are: ({}, {})", tree_height, row_index, col_index);
+                        println!(
+                            "Tree not visible. Height: {}, coords are: ({}, {})",
+                            tree_height, row_index, col_index
+                        );
                     }
                     return visible;
                 })
