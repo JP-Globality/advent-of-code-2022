@@ -73,7 +73,8 @@ fn check_if_visible(
             return true;
         }
 
-        // if the new tree height is more than or equalled to the current height, then we can return false
+        // if the new tree height is more than or equalled to the current height, then we can continue
+        // iterating over the neighbours
         if &new_tree_height >= tree_height {
             continue;
         }
@@ -120,8 +121,6 @@ fn main() {
                 })
                 .collect::<Vec<bool>>();
         })
-        .collect::<Vec<Vec<bool>>>()
-        .into_iter()
         .flatten()
         .filter(|a| a.to_owned())
         .count();
