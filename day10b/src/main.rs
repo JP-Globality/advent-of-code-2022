@@ -49,17 +49,11 @@ fn convert_line(line: &String) -> CycleDetails {
     }
 }
 
-fn apply_cycle(
-    cycle_details: CycleDetails,
-    cycle_count: &mut i32,
-    sprite_value: &mut i32,
-) {
-
+fn apply_cycle(cycle_details: CycleDetails, cycle_count: &mut i32, sprite_value: &mut i32) {
     for _ in 0..cycle_details.cost {
         let sprite_positions = [*sprite_value - 1, *sprite_value, *sprite_value + 1];
 
         let mut current_crt_position = (*cycle_count - 1) % 40;
-
 
         let mut current_crt_value = *cycle_count % 40;
         if current_crt_value == 1 {
@@ -75,7 +69,6 @@ fn apply_cycle(
 
         // Start iterating
         *cycle_count += 1;
-
     }
 
     if cycle_details.weight.is_some() {
