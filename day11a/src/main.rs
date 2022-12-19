@@ -6,8 +6,8 @@ use std::{
     path::Path,
 };
 
-extern crate regex;
 extern crate core;
+extern crate regex;
 
 use regex::Regex;
 
@@ -42,11 +42,11 @@ fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
 fn get_operation(operation_raw: &String) -> Operation {
     let mut operation_value: i32 = 0;
     {
-        if operation_raw.contains("old * old"){
+        if operation_raw.contains("old * old") {
             return Operation {
                 operation_type: OperationType::SELF_MULTIPLY,
                 value: None,
-            }
+            };
         }
 
         let re = Regex::new(r"\b(\d+)\b").unwrap();
@@ -77,7 +77,12 @@ fn get_operation(operation_raw: &String) -> Operation {
 fn map_chunks_to_monkey_input(raw_input: Vec<String>) -> MonkeyInput {
     let mut regex = Regex::new(r"Monkey\s*(\d+):").unwrap();
     let captures = regex.captures(raw_input.get(0).unwrap()).unwrap();
-    let monkey_id: i32 = captures.get(1).map(|m| m.as_str()).unwrap().parse().unwrap();
+    let monkey_id: i32 = captures
+        .get(1)
+        .map(|m| m.as_str())
+        .unwrap()
+        .parse()
+        .unwrap();
 
     // Finding the starting items
     let starting_items_raw = raw_input.get(1).unwrap();
@@ -168,14 +173,17 @@ fn split_lines_into_chunks(lines: Vec<String>, chunk_size: i32) -> Vec<Vec<Strin
     return chunks;
 }
 
-fn get_starting_items(monkey_inputs: & Vec<MonkeyInput>) -> HashMap<i32, Vec<i128>> {
+fn get_starting_items(monkey_inputs: &Vec<MonkeyInput>) -> HashMap<i32, Vec<i128>> {
     let mut data = HashMap::new();
     for mi in monkey_inputs.into_iter() {
         let monkey = mi.to_owned();
         let monkey_id = &monkey.monkey_id;
         let starting_items = &monkey.starting_items_worry_level;
 
-        let new_starting_items = starting_items.iter().map(|a| a.to_owned() as i128).collect::<Vec<i128>>();
+        let new_starting_items = starting_items
+            .iter()
+            .map(|a| a.to_owned() as i128)
+            .collect::<Vec<i128>>();
 
         data.insert(monkey_id.to_owned(), new_starting_items);
     }
@@ -183,7 +191,10 @@ fn get_starting_items(monkey_inputs: & Vec<MonkeyInput>) -> HashMap<i32, Vec<i12
     return data;
 }
 
-fn process(monkey_inputs: Vec<MonkeyInput>, starting_items_data: &mut HashMap<i32, Vec<i128>>) -> i32 {
+fn process(
+    monkey_inputs: Vec<MonkeyInput>,
+    starting_items_data: &mut HashMap<i32, Vec<i128>>,
+) -> i32 {
     // Run the iterations 20 times over
     let iteration_count = 20;
 
@@ -194,7 +205,7 @@ fn process(monkey_inputs: Vec<MonkeyInput>, starting_items_data: &mut HashMap<i3
     // Convert to something more functional (i.e a nested map
     for i in 0..iteration_count {
         println!("iteration count: -----> {}", i);
-        for mi in monkey_inputs.iter(){
+        for mi in monkey_inputs.iter() {
             let monkey_id = &mi.monkey_id;
             println!("monkey_id: {}", monkey_id);
             let starting_items = starting_items_data.get(&monkey_id).unwrap().to_owned();
@@ -206,13 +217,11 @@ fn process(monkey_inputs: Vec<MonkeyInput>, starting_items_data: &mut HashMap<i3
                 match operation.operation_type {
                     OperationType::ADD => {
                         current_worry_level += operation.value.unwrap() as i128;
-                    },
+                    }
                     OperationType::MULTIPLY => {
                         current_worry_level *= operation.value.unwrap() as i128;
-                    },
-                    OperationType::SELF_MULTIPLY => {
-                        current_worry_level *= current_worry_level
-                    },
+                    }
+                    OperationType::SELF_MULTIPLY => current_worry_level *= current_worry_level,
                     _ => panic!("unknown operation type"),
                 }
 
@@ -223,19 +232,20 @@ fn process(monkey_inputs: Vec<MonkeyInput>, starting_items_data: &mut HashMap<i3
                 // Run divisor test
                 let remainder = current_worry_level % mi.test_divisor as i128;
 
-
                 if remainder == (0 as i128) {
                     // monkey_id_pass
                     let monkey_id_pass = mi.monkey_id_pass;
 
-                    let mut new_starting_items = starting_items_data.get(&monkey_id_pass).unwrap().to_owned();
+                    let mut new_starting_items =
+                        starting_items_data.get(&monkey_id_pass).unwrap().to_owned();
                     new_starting_items.push(current_worry_level.to_owned() as i128);
                     starting_items_data.insert(monkey_id_pass, new_starting_items);
                 } else {
                     // monkey_id_fail
                     let monkey_id_fail = mi.monkey_id_fail;
 
-                    let mut new_starting_items = starting_items_data.get(&monkey_id_fail).unwrap().to_owned();
+                    let mut new_starting_items =
+                        starting_items_data.get(&monkey_id_fail).unwrap().to_owned();
                     new_starting_items.push(current_worry_level.to_owned() as i128);
                     starting_items_data.insert(monkey_id_fail, new_starting_items);
                 }
@@ -244,7 +254,8 @@ fn process(monkey_inputs: Vec<MonkeyInput>, starting_items_data: &mut HashMap<i3
                 let found_existing_score = monkey_inspection_counts.contains_key(&monkey_id);
                 if found_existing_score {
                     let existing_score = monkey_inspection_counts.get(&monkey_id).unwrap();
-                    monkey_inspection_counts.insert(monkey_id.to_owned(), (existing_score.to_owned() + 1));
+                    monkey_inspection_counts
+                        .insert(monkey_id.to_owned(), (existing_score.to_owned() + 1));
                 } else {
                     monkey_inspection_counts.insert(monkey_id.to_owned(), 1);
                 }
@@ -271,7 +282,10 @@ fn process(monkey_inputs: Vec<MonkeyInput>, starting_items_data: &mut HashMap<i3
         }
     }
 
-    let mut totals = monkey_inspection_counts.into_iter().map(|data| data.1).collect::<Vec<i32>>();
+    let mut totals = monkey_inspection_counts
+        .into_iter()
+        .map(|data| data.1)
+        .collect::<Vec<i32>>();
     totals.sort_unstable_by(|a, b| b.cmp(a));
 
     return totals.iter().take(2).fold(1, |acc, x| acc * x);
