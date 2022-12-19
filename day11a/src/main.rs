@@ -11,24 +11,17 @@ extern crate core;
 
 use regex::Regex;
 
-trait Owned {
-    fn borrow<'a>(&'a self) -> &'a Self;
-    fn borrow_mut<'a>(&'a mut self) -> &'a mut Self;
-}
-
 enum OperationType {
     ADD,
     MULTIPLY,
     SELF_MULTIPLY,
 }
 
-// #[derive(Owned)]
 struct Operation {
     operation_type: OperationType,
     value: Option<i32>,
 }
 
-// #[derive(Owned)]
 struct MonkeyInput {
     monkey_id: i32,
     starting_items_worry_level: Vec<i32>,
@@ -36,16 +29,6 @@ struct MonkeyInput {
     test_divisor: i32,
     monkey_id_pass: i32, // throw to this monkey if pass
     monkey_id_fail: i32, // throw to this monkey if fail
-}
-
-impl Owned for MonkeyInput {
-    fn borrow<'a>(&'a self) -> &'a Self {
-        self
-    }
-
-    fn borrow_mut<'a>(&'a mut self) -> &'a mut Self {
-        self
-    }
 }
 
 fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
@@ -156,9 +139,6 @@ fn map_chunks_to_monkey_input(raw_input: Vec<String>) -> MonkeyInput {
             .parse()
             .unwrap();
     }
-    println!("{}", monkey_id_pass);
-    println!("{}", monkey_id_fail);
-    println!("{}", test_divisor);
 
     return MonkeyInput {
         monkey_id,
@@ -212,14 +192,17 @@ fn process(monkey_inputs: Vec<MonkeyInput>, starting_items_data: &mut HashMap<i3
     let mut monkey_inspection_counts: HashMap<i32, i32> = HashMap::new();
 
     // Convert to something more functional (i.e a nested map
-    for _ in 0..iteration_count {
+    for i in 0..iteration_count {
+        println!("iteration count: -----> {}", i);
         for mi in monkey_inputs.iter(){
             let monkey_id = &mi.monkey_id;
+            println!("monkey_id: {}", monkey_id);
             let starting_items = starting_items_data.get(&monkey_id).unwrap().to_owned();
             let operation = &mi.operation;
 
             for starting_worry_level in starting_items.into_iter() {
                 let mut current_worry_level: i128 = starting_worry_level.to_owned() as i128;
+                println!("current_worry_level: {}", current_worry_level);
                 match operation.operation_type {
                     OperationType::ADD => {
                         current_worry_level += operation.value.unwrap() as i128;
@@ -228,50 +211,75 @@ fn process(monkey_inputs: Vec<MonkeyInput>, starting_items_data: &mut HashMap<i3
                         current_worry_level *= operation.value.unwrap() as i128;
                     },
                     OperationType::SELF_MULTIPLY => {
-                        println!("{}", current_worry_level);
                         current_worry_level *= current_worry_level
                     },
                     _ => panic!("unknown operation type"),
                 }
 
                 // Monkey gets bored with item. Worry level is divided by 3
-                current_worry_level = current_worry_level / 3;
+                let new_worry_level = current_worry_level as f64 / 3.0;
+                current_worry_level = new_worry_level.floor() as i128;
 
                 // Run divisor test
                 let remainder = current_worry_level % mi.test_divisor as i128;
-                let mut new_starting_items = starting_items_data.get(&monkey_id).unwrap().to_owned();
-                new_starting_items.push(current_worry_level.to_owned() as i128);
-                if remainder == 0 {
+
+
+                if remainder == (0 as i128) {
                     // monkey_id_pass
                     let monkey_id_pass = mi.monkey_id_pass;
 
+                    let mut new_starting_items = starting_items_data.get(&monkey_id_pass).unwrap().to_owned();
+                    new_starting_items.push(current_worry_level.to_owned() as i128);
                     starting_items_data.insert(monkey_id_pass, new_starting_items);
                 } else {
                     // monkey_id_fail
                     let monkey_id_fail = mi.monkey_id_fail;
+
+                    let mut new_starting_items = starting_items_data.get(&monkey_id_fail).unwrap().to_owned();
+                    new_starting_items.push(current_worry_level.to_owned() as i128);
                     starting_items_data.insert(monkey_id_fail, new_starting_items);
+                }
+
+                // Adding the scores to the inspection count
+                let found_existing_score = monkey_inspection_counts.contains_key(&monkey_id);
+                if found_existing_score {
+                    let existing_score = monkey_inspection_counts.get(&monkey_id).unwrap();
+                    monkey_inspection_counts.insert(monkey_id.to_owned(), (existing_score.to_owned() + 1));
+                } else {
+                    monkey_inspection_counts.insert(monkey_id.to_owned(), 1);
                 }
             }
 
-            let found_existing_score = monkey_inspection_counts.contains_key(&monkey_id);
-            if found_existing_score {
-                let existing_score = monkey_inspection_counts.get(&monkey_id).unwrap();
-                monkey_inspection_counts.insert(monkey_id.to_owned(), (existing_score.to_owned() + 1));
-            } else {
-                monkey_inspection_counts.insert(monkey_id.to_owned(), 1);
+            // Reset the monkey starting items
+            starting_items_data.insert(monkey_id.to_owned(), Vec::new());
+        }
+
+        // print which monkey has which item:
+        println!("$$$$$$$$$$$$$ End of round: $$$$$$$$$$$$$");
+        for (monkey_id, monkey_item) in monkey_inspection_counts.iter() {
+            println!("monkey id: {}", monkey_id);
+            println!("{},", monkey_item);
+        }
+
+        // print which monkey has which item:
+        for (monkey_id, monkey_items) in starting_items_data.iter() {
+            println!("monkey id: {}", monkey_id);
+            for monkey_item in monkey_items.iter() {
+                print!(" {},", monkey_item);
             }
+            println!("");
         }
     }
 
     let mut totals = monkey_inspection_counts.into_iter().map(|data| data.1).collect::<Vec<i32>>();
-    totals.sort();
+    totals.sort_unstable_by(|a, b| b.cmp(a));
 
-    return totals.iter().take(2).sum();
+    return totals.iter().take(2).fold(1, |acc, x| acc * x);
 }
 
 fn main() {
     let individual_input_length = 6;
-    let lines: Vec<String> = lines_from_file("./example.txt")
+    let lines: Vec<String> = lines_from_file("./input.txt")
         .iter()
         .map(|line| line.to_owned())
         .filter(|line| line.to_owned() != "")
@@ -286,18 +294,5 @@ fn main() {
     // process monkey inputs
     let score = process(monkey_inputs, &mut starting_items);
 
-    println!("{:}", score)
-
-
-
-    // output from all this is: total number of times each monkey inspects items
-
-    // sort the list, take the top 2 and multiply them together
-    // then you have your `monkey business`
-
-    // The real question: how do we take a line by line
-    // Iterate into single vector
-    // Then second run over the vector to group into chunks
-
-    // Parse each chunk into Monkey Input
+    println!("Score: {:}", score)
 }
