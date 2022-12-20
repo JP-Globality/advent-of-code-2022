@@ -1,17 +1,13 @@
 use std::collections::{HashMap, HashSet, VecDeque};
+use std::str::Chars;
 use std::{
     fs::File,
     io::{prelude::*, BufReader},
     path::Path,
 };
-use std::str::Chars;
-
 
 fn create_row(line: &String) -> Vec<String> {
-    return line
-        .chars()
-        .map(|a| a.to_string())
-        .collect();
+    return line.chars().map(|a| a.to_string()).collect();
 }
 
 fn create_grid() -> Vec<Vec<String>> {
@@ -23,7 +19,6 @@ fn create_grid() -> Vec<Vec<String>> {
     return grid;
 }
 
-
 fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
     let file = File::open(filename).expect("no such file");
     let buf = BufReader::new(file);
@@ -32,7 +27,7 @@ fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
         .collect()
 }
 
-fn get_next_moves(current_coords: (usize, usize), grid: & Vec<Vec<String>>) -> Vec<(usize, usize)> {
+fn get_next_moves(current_coords: (usize, usize), grid: &Vec<Vec<String>>) -> Vec<(usize, usize)> {
     // Gets the next available moves
 
     let len_rows = grid.len() as i32;
@@ -44,7 +39,11 @@ fn get_next_moves(current_coords: (usize, usize), grid: & Vec<Vec<String>>) -> V
         let new_row_index = current_coords.0 as i32 + xx.to_owned() as i32;
         let new_col_index = current_coords.1 as i32 + yy.to_owned() as i32;
 
-        if new_row_index >= 0 && new_row_index < len_rows && new_col_index >= 0 && new_col_index < len_columns {
+        if new_row_index >= 0
+            && new_row_index < len_rows
+            && new_col_index >= 0
+            && new_col_index < len_columns
+        {
             moves.push((new_row_index as usize, new_col_index as usize));
         }
     }
@@ -86,7 +85,11 @@ fn can_move(starting_character: String, ending_character: String) -> bool {
     return starting_score + 1 >= ending_score.to_owned();
 }
 
-fn find_shortest_path(starting_coords: (usize, usize), ending_coords: (usize, usize), grid: &Vec<Vec<String>>) -> i32 {
+fn find_shortest_path(
+    starting_coords: (usize, usize),
+    ending_coords: (usize, usize),
+    grid: &Vec<Vec<String>>,
+) -> i32 {
     // Finds the shortest path between two points performing a BFS
     let mut places_been: HashSet<(usize, usize)> = HashSet::new();
     let mut queue_of_work: VecDeque<(usize, usize)> = VecDeque::new();
@@ -103,19 +106,23 @@ fn find_shortest_path(starting_coords: (usize, usize), ending_coords: (usize, us
     let mut cost = 0;
 
     while let Some(current_coords) = queue_of_work.pop_front() {
-
         let mut next_queue_of_work: VecDeque<(usize, usize)> = VecDeque::new();
-        println!("current_coords: ({}, {})", current_coords.0, current_coords.1);
+        println!(
+            "current_coords: ({}, {})",
+            current_coords.0, current_coords.1
+        );
 
         // Potentially don't need this
         if places_been.contains(&(current_coords.0, current_coords.1)) {
-            continue
+            continue;
         } else {
             places_been.insert((current_coords.0.to_owned(), current_coords.1.to_owned()));
         }
 
-
-        let next_moves = get_next_moves((current_coords.0.to_owned(), current_coords.1.to_owned()), &grid);
+        let next_moves = get_next_moves(
+            (current_coords.0.to_owned(), current_coords.1.to_owned()),
+            &grid,
+        );
         for place in next_moves.iter() {
             println!("next_move: ({}, {})", place.0, place.1);
         }
@@ -123,12 +130,11 @@ fn find_shortest_path(starting_coords: (usize, usize), ending_coords: (usize, us
         let current_level = levels[&current_coords];
         for (xx, yy) in next_moves.iter() {
             if places_been.contains(&(xx.to_owned(), yy.to_owned())) {
-                continue
+                continue;
             }
 
             // Work out if we can move to the new grid character
             let new_character = &grid[xx.to_owned()][yy.to_owned()];
-
 
             if new_character == "E" {
                 cost = current_level + 1;
@@ -136,7 +142,6 @@ fn find_shortest_path(starting_coords: (usize, usize), ending_coords: (usize, us
 
             let current_character = &grid[current_coords.0.to_owned()][current_coords.1.to_owned()];
             if can_move(current_character.to_string(), new_character.to_string()) {
-
                 next_queue_of_work.push_back((xx.to_owned(), yy.to_owned()));
 
                 // Work out the cost of moving here i.e 1 + current cost
@@ -154,18 +159,19 @@ fn find_shortest_path(starting_coords: (usize, usize), ending_coords: (usize, us
     for (i, row) in grid.iter().enumerate() {
         println!("");
         for (j, character) in row.iter().enumerate() {
-            if shortest_path_map.contains_key(&(i,j)) {
-                print!("{}, ", shortest_path_map.get(&(i,j)).unwrap())
+            if shortest_path_map.contains_key(&(i, j)) {
+                print!("{}, ", shortest_path_map.get(&(i, j)).unwrap())
             } else {
                 print!(".")
             }
-
         }
     }
 
-    return shortest_path_map.get(&ending_coords.to_owned()).unwrap().to_owned();
+    return shortest_path_map
+        .get(&ending_coords.to_owned())
+        .unwrap()
+        .to_owned();
 }
-
 
 fn main() {
     // Create grid from input
@@ -174,18 +180,18 @@ fn main() {
     // Get the starting and ending coords
     let starting_letter = "S";
     let ending_letter = "E";
-    let mut starting_coords = (0,0);
-    let mut ending_coords = (0,0);
+    let mut starting_coords = (0, 0);
+    let mut ending_coords = (0, 0);
     for (i, row) in grid.iter().enumerate() {
         for (j, character) in row.iter().enumerate() {
             if character == starting_letter {
-                starting_coords = (i,j);
-                continue
+                starting_coords = (i, j);
+                continue;
             }
 
             if character == ending_letter {
                 ending_coords = (i, j);
-                continue
+                continue;
             }
         }
     }
